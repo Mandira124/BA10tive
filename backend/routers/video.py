@@ -28,7 +28,7 @@ async def process_video(request: ProcessVideoRequest):
         raise HTTPException(status_code=422, detail="Could not segment the video transcript.")
 
     all_questions = []
-    for chunk in chunks:
+    for chunk in chunks[:5]:
         try:
             questions = generate_questions_for_chunk(chunk)
             all_questions.extend(questions)
