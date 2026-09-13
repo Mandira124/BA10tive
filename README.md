@@ -9,8 +9,8 @@ A YouTube learning platform that turns educational videos into active, quiz-driv
 - **YouTube URL input** - Paste any video link with English captions
 - **Automatic transcript processing** - Fetches captions without any API key via youtube-transcript-api
 - **Intelligent segmentation** - Breaks the transcript into coherent learning chunks with topic shift detection
-- **AI question generation** - Uses Claude to generate comprehension and attention-check questions per segment
-- **Mock fallback** - Works without an Anthropic API key using heuristic placeholder questions
+- **AI question generation** - Uses Groq to generate comprehension and attention-check questions per segment
+- **Mock fallback** - Works without a Groq API key using heuristic placeholder questions
 - **Interactive quiz overlay** - Video pauses at checkpoints, question appears, feedback is immediate
 - **Attention scoring** - Weighted formula combining correctness, response speed, and skip rate
 - **Learning dashboard** - Per-section performance breakdown, weak sections highlighted, re-watch links
@@ -24,7 +24,7 @@ A YouTube learning platform that turns educational videos into active, quiz-driv
 | Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS |
 | Backend | FastAPI, Python 3.10+ |
 | Transcript | youtube-transcript-api |
-| AI | Anthropic Claude (claude-sonnet-4-20250514) |
+| AI | Groq (openai/gpt-oss-120b) |
 | State | React state + localStorage (no external store) |
 
 ---
@@ -44,7 +44,7 @@ attentive/
 │   └── services/
 │       ├── transcript_service.py   # YouTube transcript fetching + metadata
 │       ├── chunking_service.py     # Transcript segmentation with topic detection
-│       └── quiz_service.py         # Question generation (Claude API + mock fallback)
+│       └── quiz_service.py         # Question generation (Groq API + mock fallback)
 │
 └── frontend/
     └── src/
@@ -69,7 +69,7 @@ attentive/
 2. Frontend sends `POST /api/video/process`
 3. Backend fetches transcript via youtube-transcript-api
 4. Chunking service segments transcript (target: 2 minutes per chunk, sentence-boundary aware)
-5. For each chunk, quiz service calls Claude API to generate 2 questions (MCQ + attention check)
+5. For each chunk, quiz service calls the Groq API to generate 2 questions (MCQ + attention check)
 6. Full VideoInfo response stored in localStorage; user redirected to /watch
 7. YouTube IFrame API polls current time every 500ms
 8. When current time >= question trigger time, player is paused and quiz overlay renders
@@ -94,7 +94,7 @@ engagement_rate = 1 - (skipped / total)
 
 - Python 3.10 or higher
 - Node.js 18 or higher
-- An Anthropic API key (optional - mock questions work without one)
+- A Groq API key (optional - mock questions work without one; get one free at console.groq.com)
 
 ### Backend
 
@@ -110,7 +110,7 @@ pip install -r requirements.txt
 
 # Configure environment
 cp .env.example .env
-# Edit .env and add your ANTHROPIC_API_KEY (leave blank for mock questions)
+# Edit .env and add your GROQ_API_KEY (leave blank for mock questions)
 
 # Start the server
 uvicorn main:app --reload --port 8000
@@ -144,7 +144,7 @@ The frontend will be available at `http://localhost:3000`.
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | No | Claude API key for AI question generation. Omit to use mock questions. |
+| `GROQ_API_KEY` | No | Groq API key for AI question generation. Omit to use mock questions. |
 | `CORS_ORIGINS` | No | Comma-separated allowed origins. Defaults to `http://localhost:3000`. |
 
 ### Frontend (`frontend/.env.local`)
